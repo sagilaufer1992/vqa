@@ -1,5 +1,8 @@
 # our stuff
 vqa_data/*
+*.pdf
+helper.py
+mainraz.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
