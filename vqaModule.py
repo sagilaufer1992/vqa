@@ -25,9 +25,8 @@ class VqaModule(nn.Module):
     def forward(self, im):
         # b = self.image_layer1(im)
         a = self.image_conv_layers(im)
-        a = a.flatten()
+        a = a.flatten(start_dim=1)
         a = self.image_fc_layers(a)
-        print (a.size())
         return a
 
     def create_conv_layer(self, number_of_layers, in_size, out_size):
