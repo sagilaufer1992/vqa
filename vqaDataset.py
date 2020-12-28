@@ -1,11 +1,12 @@
 import torch
+import numpy as np
 from torch.utils.data import Dataset
 import torchvision.transforms as transforms
 import json
 from skimage import io
+from torch.nn.utils.rnn import pad_sequence
 
 image_prefix = "COCO_train2014_"
-
 
 class VqaDataset(Dataset):
     def __init__(self, images_path, questions_path, annotations_path):
@@ -46,16 +47,18 @@ class VqaDataset(Dataset):
                     word_hist[w] = word_hist[w] + 1
                 else:
                     word_hist[w] = 1
-        list_top_words = list(reversed(sorted(word_hist.items(), key=lambda item: item[1])))[0:1023]
+        list_top_words = list(reversed(sorted(word_hist.items(), key=lambda item: item[1])))[0:1022]
         top_words = {word: i for i, word in enumerate(list(map(lambda x: x[0], list_top_words)))}
 
         return top_words
 
     def __translate_question(self, q):
-        a = torch.tensor(list(map(self.__translate_word, q.replace("?", "").replace("'s", "").lower().split(' '))))
+        pad = np.full(max(1, 16 - len(q.split(' '))), 1023)
+        a = torch.tensor(list(map(self.__translate_word, q.replace("?", "").replace("'s", "").lower().split(' ')[0:15])))
+        a = torch.cat([a, torch.tensor(pad)])
         return a
     
     def __translate_word(self, w):
         if w in self.words_dictionary:
             return self.words_dictionary[w]
-        return 1023
+        return 1022

@@ -22,13 +22,14 @@ train_dataset = VqaDataset(images_path="./vqa_data/train/images/train2014/",
                            questions_path="./vqa_data/train/v2_OpenEnded_mscoco_train2014_questions.json", 
                            annotations_path="./vqa_data/train/v2_mscoco_train2014_annotations.json")
 
-train_loader = DataLoader(train_dataset, 1, True)
+train_loader = DataLoader(train_dataset, 30, True)
 
 mod = VqaModule()
 
 for i, (im, a, q) in enumerate(train_loader):
     # print (a)
     # save_image(im[0], "img1.png")
+    break
     mod.forward(im)
     break
 
