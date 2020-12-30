@@ -35,7 +35,6 @@ class VqaDataset(Dataset):
         self.annotaions_scores = self.temp_annotation_scores
         self.annotations = self.temp_annotations
 
-        print(self.__len__())
 
     def __len__(self):
         return len(self.questions)
@@ -48,7 +47,16 @@ class VqaDataset(Dataset):
                                                             prefix=image_prefix, 
                                                             imagesindex=img_id.zfill(12))
         annotation_score = self.annotaions_scores[idx]
-        image = io.imread(img_path)         
+        image = io.imread(img_path)
+        transformed_image = self.transform(image)
+
+        # in case of B&W pictures
+        print (transformed_image.size()[0], img_id)
+        if transformed_image.size()[0] == 1:
+            print("dfafasdf", idx)
+            transformed_image = torch.stack([transformed_image, transformed_image.clone().detach(), transformed_image.clone().detach()])
+            print ("qweqweqweqwe", transformed_image.size()[0])
+
 
         return self.transform(image), annotation_score, question
 
@@ -92,7 +100,7 @@ class VqaDataset(Dataset):
             else:
                 word_hist[ans] = 1
 
-        list_top_words = list(reversed(sorted(word_hist.items(), key=lambda item: item[1])))[0:512]
+        list_top_words = list(reversed(sorted(word_hist.items(), key=lambda item: item[1])))[0:128]
         top_words = {word: i for i, word in enumerate(list(map(lambda x: x[0], list_top_words)))}
         return top_words
 
@@ -106,7 +114,7 @@ class VqaDataset(Dataset):
                     score_dict[ans['answer']] += 1
                 else:
                     score_dict[ans['answer']] = 1
-            score_vec = torch.zeros(1000)
+            score_vec = torch.zeros(128)
 
             is_relevant = False
 

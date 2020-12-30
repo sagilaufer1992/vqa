@@ -1,3 +1,4 @@
+import torch
 import torch.nn as nn
 
 
@@ -21,13 +22,22 @@ class VqaModule(nn.Module):
         )
        
         # question stuff
+
+        self.embedding = nn.Embedding(1024, 16)
+        self.lstm = nn.LSTM(16, 1024)
+
    
-    def forward(self, im):
+    def forward(self, im, q):
         # b = self.image_layer1(im)
-        a = self.image_conv_layers(im)
-        a = a.flatten(start_dim=1)
-        a = self.image_fc_layers(a)
-        return a
+        image_result = self.image_conv_layers(im)
+        image_result = image_result.flatten(start_dim=1)
+        image_result = self.image_fc_layers(image_result)
+        question_result, hidden = self.lstm(self.embedding(q), (torch.zeros(1, 16, 1024), torch.zeros(1, 16, 1024)))
+        
+        print(question_result[:,-1,:].size())
+        print(image_result.size())
+
+        return image_result, question_result
 
     def create_conv_layer(self, number_of_layers, in_size, out_size):
         modules = []

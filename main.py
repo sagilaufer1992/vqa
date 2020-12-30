@@ -29,8 +29,6 @@ mod = VqaModule()
 for i, (im, a, q) in enumerate(train_loader):
     # print (a)
     # save_image(im[0], "img1.png")
-    # mod.forward(im)
-    print (a)
-    print(q)
+    mod.forward(im, q)
     break
 
